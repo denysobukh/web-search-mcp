@@ -8,11 +8,11 @@
 import { SearchEngine } from '../dist/search-engine.js';
 
 async function testSearchEngine(query = 'javascript programming', numResults = 3) {
-  console.log('🔍 Testing Web Search MCP Server - All Engines');
-  console.log('===============================================');
-  console.log(`Query: "${query}"`);
-  console.log(`Expected results: ${numResults}`);
-  console.log('');
+  console.warn('🔍 Testing Web Search MCP Server - All Engines');
+  console.warn('===============================================');
+  console.warn(`Query: "${query}"`);
+  console.warn(`Expected results: ${numResults}`);
+  console.warn('');
 
   const searchEngine = new SearchEngine();
 
@@ -25,24 +25,24 @@ async function testSearchEngine(query = 'javascript programming', numResults = 3
     });
     const endTime = Date.now();
 
-    console.log(`⚡ Search completed in ${endTime - startTime}ms`);
-    console.log(`🎯 Engine used: ${result.engine}`);
-    console.log(`📊 Results found: ${result.results.length}`);
-    console.log('');
+    console.warn(`⚡ Search completed in ${endTime - startTime}ms`);
+    console.warn(`🎯 Engine used: ${result.engine}`);
+    console.warn(`📊 Results found: ${result.results.length}`);
+    console.warn('');
 
     if (result.results.length === 0) {
-      console.log('❌ No results found!');
+      console.warn('❌ No results found!');
       return false;
     }
 
-    console.log('📋 Results:');
-    console.log('===========');
+    console.warn('📋 Results:');
+    console.warn('===========');
     
     result.results.forEach((item, index) => {
-      console.log(`${index + 1}. ${item.title}`);
-      console.log(`   🔗 ${item.url}`);
-      console.log(`   📝 ${item.description.substring(0, 100)}${item.description.length > 100 ? '...' : ''}`);
-      console.log('');
+      console.warn(`${index + 1}. ${item.title}`);
+      console.warn(`   🔗 ${item.url}`);
+      console.warn(`   📝 ${item.description.substring(0, 100)}${item.description.length > 100 ? '...' : ''}`);
+      console.warn('');
     });
 
     // Validate results
@@ -55,10 +55,10 @@ async function testSearchEngine(query = 'javascript programming', numResults = 3
       r.description !== 'No description available'
     );
 
-    console.log(`✅ Valid results: ${validResults.length}/${result.results.length}`);
+    console.warn(`✅ Valid results: ${validResults.length}/${result.results.length}`);
     
     if (validResults.length === 0) {
-      console.log('❌ No valid results found!');
+      console.warn('❌ No valid results found!');
       return false;
     }
 
@@ -73,8 +73,8 @@ async function testSearchEngine(query = 'javascript programming', numResults = 3
 }
 
 async function runTests() {
-  console.log('🧪 Running comprehensive search engine tests...');
-  console.log('================================================');
+  console.warn('🧪 Running comprehensive search engine tests...');
+  console.warn('================================================');
 
   const testQueries = [
     'javascript programming',
@@ -87,33 +87,33 @@ async function runTests() {
 
   for (let i = 0; i < testQueries.length; i++) {
     const query = testQueries[i];
-    console.log(`\n🔍 Test ${i + 1}/${totalTests}: "${query}"`);
-    console.log('─'.repeat(50));
+    console.warn(`\n🔍 Test ${i + 1}/${totalTests}: "${query}"`);
+    console.warn('─'.repeat(50));
     
     const success = await testSearchEngine(query, 5);
     if (success) {
       passedTests++;
-      console.log('✅ Test PASSED');
+      console.warn('✅ Test PASSED');
     } else {
-      console.log('❌ Test FAILED');
+      console.warn('❌ Test FAILED');
     }
     
     if (i < testQueries.length - 1) {
-      console.log('\n⏳ Waiting 2 seconds before next test...');
+      console.warn('\n⏳ Waiting 2 seconds before next test...');
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
 
-  console.log('\n🏁 Test Summary');
-  console.log('===============');
-  console.log(`Tests passed: ${passedTests}/${totalTests}`);
-  console.log(`Success rate: ${Math.round((passedTests / totalTests) * 100)}%`);
+  console.warn('\n🏁 Test Summary');
+  console.warn('===============');
+  console.warn(`Tests passed: ${passedTests}/${totalTests}`);
+  console.warn(`Success rate: ${Math.round((passedTests / totalTests) * 100)}%`);
   
   if (passedTests === totalTests) {
-    console.log('🎉 All tests passed!');
+    console.warn('🎉 All tests passed!');
     process.exit(0);
   } else {
-    console.log('⚠️  Some tests failed');
+    console.warn('⚠️  Some tests failed');
     process.exit(1);
   }
 }

@@ -60,7 +60,7 @@ try {
     }
   });
   
-  console.log('✅ Bundle created: dist/bundle.js');
+  console.warn('✅ Bundle created: dist/bundle.js');
 } catch (error) {
   console.error('❌ Bundle failed:', error);
   process.exit(1);

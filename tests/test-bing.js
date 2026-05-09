@@ -4,7 +4,7 @@
 import { chromium } from 'playwright';
 
 async function testBing() {
-  console.log('=== TESTING BING SEARCH ===');
+  console.warn('=== TESTING BING SEARCH ===');
   
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -17,31 +17,31 @@ async function testBing() {
   try {
     const query = 'javascript tutorial';
     const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}&count=5`;
-    console.log(`Navigating to: ${searchUrl}`);
+    console.warn(`Navigating to: ${searchUrl}`);
     
     const startTime = Date.now();
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
     const loadTime = Date.now() - startTime;
     
     const html = await page.content();
-    console.log(`✓ Page loaded successfully in ${loadTime}ms`);
-    console.log(`✓ HTML length: ${html.length} characters`);
+    console.warn(`✓ Page loaded successfully in ${loadTime}ms`);
+    console.warn(`✓ HTML length: ${html.length} characters`);
     
     // Check for bot detection
     const title = await page.title();
-    console.log(`✓ Page title: ${title}`);
+    console.warn(`✓ Page title: ${title}`);
     
     if (title.includes('Access Denied') || title.includes('Captcha') || html.includes('unusual traffic')) {
-      console.log('❌ Bot detection detected');
+      console.warn('❌ Bot detection detected');
       return false;
     }
     
     // Parse results
     const resultElements = await page.$$('.b_algo');
-    console.log(`✓ Found ${resultElements.length} .b_algo elements`);
+    console.warn(`✓ Found ${resultElements.length} .b_algo elements`);
     
     if (resultElements.length > 0) {
-      console.log('\n--- SAMPLE RESULTS ---');
+      console.warn('\n--- SAMPLE RESULTS ---');
       for (let i = 0; i < Math.min(3, resultElements.length); i++) {
         const titleElement = await resultElements[i].$('h2 a');
         const snippetElement = await resultElements[i].$('.b_caption p');
@@ -50,21 +50,21 @@ async function testBing() {
         const url = titleElement ? await titleElement.getAttribute('href') : 'No URL';
         const snippet = snippetElement ? await snippetElement.textContent() : 'No snippet';
         
-        console.log(`${i + 1}. ${title?.trim()}`);
-        console.log(`   URL: ${url}`);
-        console.log(`   Snippet: ${snippet?.trim().substring(0, 100)}...`);
-        console.log('');
+        console.warn(`${i + 1}. ${title?.trim()}`);
+        console.warn(`   URL: ${url}`);
+        console.warn(`   Snippet: ${snippet?.trim().substring(0, 100)}...`);
+        console.warn('');
       }
       
-      console.log('✅ BING SEARCH: SUCCESS');
+      console.warn('✅ BING SEARCH: SUCCESS');
       return true;
     } else {
-      console.log('❌ No results found');
+      console.warn('❌ No results found');
       return false;
     }
 
   } catch (error) {
-    console.log(`❌ BING SEARCH FAILED: ${error.message}`);
+    console.warn(`❌ BING SEARCH FAILED: ${error.message}`);
     return false;
   } finally {
     await browser.close();
@@ -72,6 +72,6 @@ async function testBing() {
 }
 
 testBing().then(success => {
-  console.log(`\nBING RESULT: ${success ? 'WORKING ✅' : 'FAILED ❌'}`);
+  console.warn(`\nBING RESULT: ${success ? 'WORKING ✅' : 'FAILED ❌'}`);
   process.exit(success ? 0 : 1);
 });

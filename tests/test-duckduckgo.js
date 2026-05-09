@@ -4,7 +4,7 @@
 import { chromium } from 'playwright';
 
 async function testDuckDuckGo() {
-  console.log('=== TESTING DUCKDUCKGO SEARCH ===');
+  console.warn('=== TESTING DUCKDUCKGO SEARCH ===');
   
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -27,8 +27,8 @@ async function testDuckDuckGo() {
       const searchUrl = urls[i];
       const urlType = i === 0 ? 'Main DDG' : 'HTML DDG';
       
-      console.log(`\n--- Testing ${urlType} ---`);
-      console.log(`Navigating to: ${searchUrl}`);
+      console.warn(`\n--- Testing ${urlType} ---`);
+      console.warn(`Navigating to: ${searchUrl}`);
       
       try {
         const startTime = Date.now();
@@ -38,17 +38,17 @@ async function testDuckDuckGo() {
         await page.waitForTimeout(2000); // Wait for any dynamic content
         
         const html = await page.content();
-        console.log(`✓ Page loaded successfully in ${loadTime}ms`);
-        console.log(`✓ HTML length: ${html.length} characters`);
+        console.warn(`✓ Page loaded successfully in ${loadTime}ms`);
+        console.warn(`✓ HTML length: ${html.length} characters`);
         
         // Check for bot detection or error messages
         const title = await page.title();
-        console.log(`✓ Page title: ${title}`);
+        console.warn(`✓ Page title: ${title}`);
         
         if (html.includes('error-lite') || html.includes('email us') || 
             html.length < 1000 || title === '') {
-          console.log('❌ Error page or bot detection detected');
-          console.log('Sample HTML:', html.substring(0, 500));
+          console.warn('❌ Error page or bot detection detected');
+          console.warn('Sample HTML:', html.substring(0, 500));
           continue;
         }
         
@@ -66,7 +66,7 @@ async function testDuckDuckGo() {
         
         for (const selector of resultSelectors) {
           resultElements = await page.$$(selector);
-          console.log(`✓ Found ${resultElements.length} elements with selector: ${selector}`);
+          console.warn(`✓ Found ${resultElements.length} elements with selector: ${selector}`);
           if (resultElements.length > 0) {
             workingSelector = selector;
             break;
@@ -74,7 +74,7 @@ async function testDuckDuckGo() {
         }
         
         if (resultElements.length > 0) {
-          console.log(`\n--- SAMPLE RESULTS (${urlType}) ---`);
+          console.warn(`\n--- SAMPLE RESULTS (${urlType}) ---`);
           for (let j = 0; j < Math.min(3, resultElements.length); j++) {
             // Try multiple title selectors
             const titleSelectors = ['h2 a', '.result__title a', 'a[data-testid="result-title-a"]', 'h3 a'];
@@ -101,28 +101,28 @@ async function testDuckDuckGo() {
               }
             }
             
-            console.log(`${j + 1}. ${title.trim()}`);
-            console.log(`   URL: ${url}`);
-            console.log(`   Snippet: ${snippet.trim().substring(0, 100)}...`);
-            console.log('');
+            console.warn(`${j + 1}. ${title.trim()}`);
+            console.warn(`   URL: ${url}`);
+            console.warn(`   Snippet: ${snippet.trim().substring(0, 100)}...`);
+            console.warn('');
           }
           
-          console.log(`✅ DUCKDUCKGO SEARCH (${urlType}): SUCCESS`);
+          console.warn(`✅ DUCKDUCKGO SEARCH (${urlType}): SUCCESS`);
           return true;
         } else {
-          console.log(`❌ No results found with ${urlType}`);
+          console.warn(`❌ No results found with ${urlType}`);
         }
         
       } catch (error) {
-        console.log(`❌ ${urlType} failed: ${error.message}`);
+        console.warn(`❌ ${urlType} failed: ${error.message}`);
       }
     }
     
-    console.log('❌ All DuckDuckGo variants failed');
+    console.warn('❌ All DuckDuckGo variants failed');
     return false;
 
   } catch (error) {
-    console.log(`❌ DUCKDUCKGO SEARCH FAILED: ${error.message}`);
+    console.warn(`❌ DUCKDUCKGO SEARCH FAILED: ${error.message}`);
     return false;
   } finally {
     await browser.close();
@@ -130,6 +130,6 @@ async function testDuckDuckGo() {
 }
 
 testDuckDuckGo().then(success => {
-  console.log(`\nDUCKDUCKGO RESULT: ${success ? 'WORKING ✅' : 'FAILED ❌'}`);
+  console.warn(`\nDUCKDUCKGO RESULT: ${success ? 'WORKING ✅' : 'FAILED ❌'}`);
   process.exit(success ? 0 : 1);
 });

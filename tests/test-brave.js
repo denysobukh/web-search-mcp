@@ -4,7 +4,7 @@
 import { chromium } from 'playwright';
 
 async function testBrave() {
-  console.log('=== TESTING BRAVE SEARCH ===');
+  console.warn('=== TESTING BRAVE SEARCH ===');
   
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -17,7 +17,7 @@ async function testBrave() {
   try {
     const query = 'javascript tutorial';
     const searchUrl = `https://search.brave.com/search?q=${encodeURIComponent(query)}&source=web`;
-    console.log(`Navigating to: ${searchUrl}`);
+    console.warn(`Navigating to: ${searchUrl}`);
     
     const startTime = Date.now();
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
@@ -26,18 +26,18 @@ async function testBrave() {
     await page.waitForTimeout(2000); // Wait for any dynamic content
     
     const html = await page.content();
-    console.log(`✓ Page loaded successfully in ${loadTime}ms`);
-    console.log(`✓ HTML length: ${html.length} characters`);
+    console.warn(`✓ Page loaded successfully in ${loadTime}ms`);
+    console.warn(`✓ HTML length: ${html.length} characters`);
     
     // Check for bot detection
     const title = await page.title();
-    console.log(`✓ Page title: ${title}`);
+    console.warn(`✓ Page title: ${title}`);
     
     if (title.includes('Access Denied') || title.includes('Captcha') || 
         html.includes('unusual traffic') || html.includes('blocked') ||
         html.length < 1000) {
-      console.log('❌ Bot detection detected');
-      console.log('Sample HTML:', html.substring(0, 500));
+      console.warn('❌ Bot detection detected');
+      console.warn('Sample HTML:', html.substring(0, 500));
       return false;
     }
     
@@ -55,7 +55,7 @@ async function testBrave() {
     
     for (const selector of resultSelectors) {
       resultElements = await page.$$(selector);
-      console.log(`✓ Found ${resultElements.length} elements with selector: ${selector}`);
+      console.warn(`✓ Found ${resultElements.length} elements with selector: ${selector}`);
       if (resultElements.length > 0) {
         workingSelector = selector;
         break;
@@ -63,7 +63,7 @@ async function testBrave() {
     }
     
     if (resultElements.length > 0) {
-      console.log('\n--- SAMPLE RESULTS ---');
+      console.warn('\n--- SAMPLE RESULTS ---');
       for (let i = 0; i < Math.min(3, resultElements.length); i++) {
         // Try multiple title selectors for Brave
         const titleSelectors = [
@@ -102,22 +102,22 @@ async function testBrave() {
           }
         }
         
-        console.log(`${i + 1}. ${title.trim()}`);
-        console.log(`   URL: ${url}`);
-        console.log(`   Snippet: ${snippet.trim().substring(0, 100)}...`);
-        console.log('');
+        console.warn(`${i + 1}. ${title.trim()}`);
+        console.warn(`   URL: ${url}`);
+        console.warn(`   Snippet: ${snippet.trim().substring(0, 100)}...`);
+        console.warn('');
       }
       
-      console.log('✅ BRAVE SEARCH: SUCCESS');
+      console.warn('✅ BRAVE SEARCH: SUCCESS');
       return true;
     } else {
-      console.log('❌ No results found');
-      console.log('Sample HTML:', html.substring(0, 1000));
+      console.warn('❌ No results found');
+      console.warn('Sample HTML:', html.substring(0, 1000));
       return false;
     }
 
   } catch (error) {
-    console.log(`❌ BRAVE SEARCH FAILED: ${error.message}`);
+    console.warn(`❌ BRAVE SEARCH FAILED: ${error.message}`);
     return false;
   } finally {
     await browser.close();
@@ -125,6 +125,6 @@ async function testBrave() {
 }
 
 testBrave().then(success => {
-  console.log(`\nBRAVE RESULT: ${success ? 'WORKING ✅' : 'FAILED ❌'}`);
+  console.warn(`\nBRAVE RESULT: ${success ? 'WORKING ✅' : 'FAILED ❌'}`);
   process.exit(success ? 0 : 1);
 });

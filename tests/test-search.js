@@ -6,7 +6,7 @@ import { SearchEngine } from '../dist/search-engine.js';
 const searchEngine = new SearchEngine();
 
 async function testSearch() {
-  console.log('Testing search functionality...');
+  console.warn('Testing search functionality...');
   
   try {
     const result = await searchEngine.search({
@@ -15,14 +15,14 @@ async function testSearch() {
       timeout: 15000  // 15 second timeout for testing
     });
     
-    console.log(`Search completed with engine: ${result.engine}`);
-    console.log(`Found ${result.results.length} results:`);
+    console.warn(`Search completed with engine: ${result.engine}`);
+    console.warn(`Found ${result.results.length} results:`);
     
     result.results.forEach((r, i) => {
-      console.log(`${i + 1}. ${r.title}`);
-      console.log(`   URL: ${r.url}`);
-      console.log(`   Description: ${r.description.substring(0, 100)}...`);
-      console.log('');
+      console.warn(`${i + 1}. ${r.title}`);
+      console.warn(`   URL: ${r.url}`);
+      console.warn(`   Description: ${r.description.substring(0, 100)}...`);
+      console.warn('');
     });
     
     // Clean up
@@ -36,6 +36,6 @@ async function testSearch() {
 }
 
 testSearch().then(() => {
-  console.log('Test completed successfully');
+  console.warn('Test completed successfully');
   process.exit(0);
 });
