@@ -2,6 +2,19 @@
 
 A TypeScript MCP (Model Context Protocol) server that provides comprehensive web search capabilities using direct connections (no API keys required) with multiple tools for different use cases.
 
+## Table of Contents
+
+- [Features](#features)
+- [How It Works](#how-it-works)
+- [Compatibility](#compatibility)
+- [Installation](#installation-recommended)
+- [Environment Variables](#environment-variables)
+- [Troubleshooting](#troubleshooting)
+- [Development](#for-development)
+- [MCP Tools](#mcp-tools)
+- [Standalone Usage](#standalone-usage)
+- [Important: Stdio Protocol and Console Logging](#important-stdio-protocol-and-console-logging)
+
 ## Features
 
 - **Multi-Engine Web Search**: Prioritises Bing > Brave > DuckDuckGo for optimal reliability and performance
@@ -257,6 +270,75 @@ You can also run the server directly:
 # If running from source
 npm start
 ```
+
+## Important: Stdio Protocol and Console Logging
+
+This MCP server uses the **stdio transport** for communication with MCP clients. Understanding how stdio works is critical for debugging and development:
+
+### How JSON-RPC Messages Flow
+
+The server communicates with MCP clients through standard I/O streams:
+
+| Stream | File Descriptor | Purpose |
+|--------|----------------|---------|
+| **stdin** | fd 0 | Receives JSON-RPC requests from the client |
+| **stdout** | fd 1 | Sends JSON-RPC responses to the client |
+| **stderr** | fd 2 | Debug/logging output (visible in terminal, ignored by client) |
+
+Each JSON-RPC message is serialized as a single line:
+```javascript
+// SDK internal (node_modules/@modelcontextprotocol/sdk/dist/esm/shared/stdio.js)
+export function serializeMessage(message) {
+    return JSON.stringify(message) + "\n";
+}
+```
+
+### Why `console.log` Breaks the Protocol
+
+**`console.log()` writes to stdout (fd 1)** — the same stream used for JSON-RPC messages. If you use `console.log()` in your server code, the MCP client receives:
+
+```
+{"jsonrpc":"2.0","result":...}     ← valid JSON-RPC
+Debug message here                 ← console.log output — NOT valid JSON-RPC
+{"jsonrpc":"2.0","result":...}     ← valid JSON-RPC
+```
+
+The client attempts to `JSON.parse()` every line from stdout. Non-JSON output causes **protocol corruption or client crashes**.
+
+### Safe Logging Practices
+
+| Method | Writes to | Safe for MCP? |
+|--------|-----------|---------------|
+| `console.log()` | stdout (fd 1) | ❌ **Never use** |
+| `console.info()` | stdout (fd 1) | ❌ **Never use** |
+| `console.warn()` | stderr (fd 2) | ✅ **Safe** |
+| `console.error()` | stderr (fd 2) | ✅ **Safe** |
+
+**Always use `console.warn()` or `console.error()` for debugging** — they write to stderr, which is completely separate from the JSON-RPC channel.
+
+### Example
+
+```typescript
+// ❌ WRONG - corrupts JSON-RPC protocol
+console.log('Server started');
+
+// ✅ CORRECT - goes to stderr, invisible to MCP client
+console.warn('Server started');
+console.error('Debug: connection established');
+```
+
+### Internal Flow
+
+```
+src/index.ts:518
+  → this.server.connect(transport)
+    → StdioServerTransport.start()
+      → server sends JSON-RPC via transport.send(message)
+        → serializeMessage(message) → JSON.stringify(message) + "\n"
+          → process.stdout.write(json)
+```
+
+See `node_modules/@modelcontextprotocol/sdk/dist/esm/server/stdio.js` (line 68) for the actual stdout write implementation.
 
 ## Documentation
 
